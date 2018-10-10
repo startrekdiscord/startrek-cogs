@@ -1,9 +1,0 @@
-{
-    AUTHOR  SuperZeldaBros,
-    SHORT  Set countdowns for events,
-    DESCRIPTION  Allows for a countdown to specific dates,
-    DISABLED  false,
-    NAME  Countdown,
-    TAGS  [utility],
-    INSTALL_MSG  Thanks for installing.
-}
