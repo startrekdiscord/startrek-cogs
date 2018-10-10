@@ -1,0 +1,9 @@
+{
+    "AUTHOR" : "SuperZeldaBros",
+    "SHORT" : "Replacement for Nomad's Countdown Function",
+    "DESCRIPTION" : "Allows for users to check how long until a certain event..",
+    "DISABLED" : false,
+    "NAME" : "countdown",
+    "INSTALL_MSG" : "IT'S THE FINAL COUNTDOWN",
+    "TAGS" : ["utility"]
+}
