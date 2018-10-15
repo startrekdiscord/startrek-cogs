@@ -1,0 +1,9 @@
+{
+    "AUTHOR" : "Wiggums",
+    "SHORT" : "Various Star Trek related commands",
+    "DESCRIPTION" : "Allows users to get a random recommendation or search a specific episode in memory alpha",
+    "DISABLED" : false,
+    "NAME" : "tv",
+    "INSTALL_MSG" : "TV loaded.",
+    "TAGS" : ["utility"]
+}
