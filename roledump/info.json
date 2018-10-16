@@ -1,0 +1,10 @@
+
+{
+    "AUTHOR" : "Jadzia",
+    "SHORT" : "Dumps roles into a .json file",
+    "DESCRIPTION" : "Utility for the eventual /roles replacement",
+    "DISABLED" : false,
+    "NAME" : "roledump",
+    "INSTALL_MSG" : "TV loaded.",
+    "TAGS" : ["utility"]
+}
