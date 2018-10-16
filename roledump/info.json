@@ -5,6 +5,6 @@
     "DESCRIPTION" : "Utility for the eventual /roles replacement",
     "DISABLED" : false,
     "NAME" : "roledump",
-    "INSTALL_MSG" : "TV loaded.",
+    "INSTALL_MSG" : "Roledump Loaded.",
     "TAGS" : ["utility"]
 }
