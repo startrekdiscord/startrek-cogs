@@ -1,0 +1,9 @@
+{
+	"AUTHOR" : "Jadzia",
+	"SHORT" : "Server-specific role counting and listing",
+	"DESCRIPTION" : "Provides commands to list roles, based on various subcategories and sort modes. Also can count users of a specific role, or count the total roles on the server.",
+	"DISABLED" : false,
+	"NAME" : "rolelist",
+	"INSTALL_MSG" : "Ready to rock and *role*.",
+	"TAGS" : ["utility", "moderation"]
+}
