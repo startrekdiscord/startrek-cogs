@@ -117,11 +117,11 @@ class RoleList:
 	@commands.command(pass_context=True)
 	async def roles(self, ctx, category:str='all', sort_order:str='name'):
 		"""Shows roles and their member counts. 
-		The category is one of: all, species, rank, divion, game 
+		The category is one of: all, species, rank, division, game 
 		and sortorder is one of: default, name, count.
 		The species and all categories are only available to admin users."""
 
-		if not category in ['all', 'species', 'rank', 'divion', 'game'] or not sort_order in ['default', 'name', 'count']: # make sure it has valid args
+		if not category in ['all', 'species', 'rank', 'division', 'game'] or not sort_order in ['default', 'name', 'count']: # make sure it has valid args
 			await self.bot.say("Invalid arguments. Check the help for this command.")
 			return
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES) and category in ['all', 'species']: # restrict the spammy ones to admins
