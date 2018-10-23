@@ -51,6 +51,8 @@ class RoleList:
 	SPECIES_BEFORE = 332679652164501507 # the Computer role (transparent one)
 	SPECIES_AFTER = 275800501944320012 # the Engineering division role
 
+	MAX_USERS = 30 # max people to list for !whohas
+
 	def __init__(self, bot):
 		self.bot = bot
 
@@ -60,14 +62,6 @@ class RoleList:
 			if role.name in role_query:
 				return True
 		return False
-
-	def dynamic_pad(self, number, width):
-		# pads a number in non-monospace text to a fixed width
-		num_str = str(number)
-		num_width = sum(RELATIVE_WIDTH.get(digit,20) for digit in num_str)
-		pads = round((width*SPACE_WIDTH - num_width - 2*SPACE_WIDTH)/PADDING_WIDTH)
-		return num_str + ' ' + PADDING_CHAR*int(pads) + ' '
-
 
 	def alphanum_filter(self, text):
 		# filter for searching a role by name without having to worry about case or punctuation
@@ -80,6 +74,14 @@ class RoleList:
 			if int(role.id) in id_list:
 				out_roles.append(role)
 		return out_roles
+
+	def get_named_role(self, server, rolename):
+		# finds a role in a server by name
+		check_name = self.alphanum_filter(rolename)
+		for role in server.roles:
+			if self.alphanum_filter(role.name) == check_name:
+				return role
+		return None
 
 	def role_accumulate(self, check_roles, members):
 		## iterate over the members to accumulate a count of each role
@@ -100,8 +102,7 @@ class RoleList:
 		pages = []
 		buildstr = ''
 		for role,count in rlist: # this generates and paginates the info
-			line = '{}{}\n'.format(self.dynamic_pad(count,PAD_SIZE),role.mention)
-			#line = '{} {}\n'.format(count,role.mention) # this line avoids the attempt to pad the spacing between the numbers and the names
+			line = '{} {}\n'.format(count,role.mention)
 			if len(buildstr) + len(line) > EMBED_MAX_LEN:
 				pages.append(buildstr) # split the page here
 				buildstr = line
@@ -117,11 +118,11 @@ class RoleList:
 	@commands.command(pass_context=True)
 	async def roles(self, ctx, category:str='all', sort_order:str='name'):
 		"""Shows roles and their member counts. 
-		The category is one of: all, species, rank, division, game 
+		The category is one of: all, species, rank, divion, game 
 		and sortorder is one of: default, name, count.
 		The species and all categories are only available to admin users."""
 
-		if not category in ['all', 'species', 'rank', 'division', 'game'] or not sort_order in ['default', 'name', 'count']: # make sure it has valid args
+		if not category in ['all', 'species', 'rank', 'divion', 'game'] or not sort_order in ['default', 'name', 'count']: # make sure it has valid args
 			await self.bot.say("Invalid arguments. Check the help for this command.")
 			return
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES) and category in ['all', 'species']: # restrict the spammy ones to admins
@@ -173,12 +174,7 @@ class RoleList:
 	@commands.command(pass_context=True)
 	async def rolecall(self, ctx, *, rolename):
 		"""Counts the number of members with a specific role."""
-		check_name = self.alphanum_filter(rolename)
-		check_role = None
-		for role in ctx.message.server.roles:
-			if self.alphanum_filter(role.name) == check_name:
-				check_role = role
-				break
+		check_role = self.get_named_role(ctx.message.server, rolename)
 		if not check_role:
 			await self.bot.say("I can't find that role!")
 			return
@@ -194,6 +190,33 @@ class RoleList:
 		embed = discord.Embed(title=check_role.name, description='{}/{} online'.format(online, count), color=check_role.color)
 		embed.set_footer(text='ID: {}'.format(check_role.id))
 		await self.bot.say(embed=embed)
+
+	@commands.command(pass_context=True)
+	async def whohas(self, ctx, *, rolename):
+		"""Lists the people who have the specified role."""
+		check_role = self.get_named_role(ctx.message.server, rolename)
+		if not check_role:
+			await self.bot.say("I can't find that role!")
+			return
+
+		users = []
+		for member in ctx.message.server.members:
+			if check_role in member.roles:
+				users.append(member)
+
+		sorted_list = sorted(users, key=lambda usr: usr.nick.lower() if usr.nick else usr.name.lower())
+		truncated = False
+		if len(sorted_list) > self.MAX_USERS:
+			sorted_list = sorted_list[:self.MAX_USERS] ## truncate to the limit
+			truncated = True
+		page = '\n'.join(member.mention for member in sorted_list) # not bothering with multiple pages cause 30 members is way shorter than one embed
+		if truncated:
+			page += '\n*and {} more...*'.format(len(users) - self.MAX_USERS)
+
+		embed = discord.Embed(title='{} members with {}'.format(len(users), check_role.name), description=page, color=check_role.color)
+		embed.set_footer(text='ID: {}'.format(check_role.id))
+		await self.bot.say(embed=embed)
+
 
 	@commands.command(pass_context=True)
 	async def rolecount(self, ctx):
