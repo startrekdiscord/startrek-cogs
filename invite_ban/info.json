@@ -1,0 +1,11 @@
+{
+    "AUTHOR": "SuperZeldaBros",
+    "SHORT": "Ban Invite Names",
+    "DESCRIPTION": "Immediately bans new users with discord.gg in their name or users changing to a name containing discord.gg",
+    "DISABLED": false,
+    "NAME": "invite_ban",
+    "INSTALL_MSG": "Invite Names Banning Loaded",
+    "TAGS": [
+        "utility"
+    ]
+}
