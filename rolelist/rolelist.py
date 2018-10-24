@@ -193,7 +193,16 @@ class RoleList:
 
 	@commands.command(pass_context=True)
 	async def whohas(self, ctx, *, rolename):
-		"""Lists the people who have the specified role."""
+		"""Lists the people who have the specified role.
+		Can take a -nick or -username argument to enhance output."""
+		mode = 0 # tells how to display: 0 = just mention, 1 = add nickname, 2 = add username
+		if '-nick' in rolename:
+			mode = 1
+			rolename = rolename.replace('-nick','')
+		elif '-username' in rolename:
+			mode = 2
+			rolename = rolename.replace('-username','')
+
 		check_role = self.get_named_role(ctx.message.server, rolename)
 		if not check_role:
 			await self.bot.say("I can't find that role!")
@@ -209,14 +218,19 @@ class RoleList:
 		if len(sorted_list) > self.MAX_USERS:
 			sorted_list = sorted_list[:self.MAX_USERS] ## truncate to the limit
 			truncated = True
-		page = '\n'.join(member.mention for member in sorted_list) # not bothering with multiple pages cause 30 members is way shorter than one embed
+		if mode == 2: # add full username
+			page = '\n'.join('{} ({}#{})'.format(member.mention, member.name, member.discriminator) for member in sorted_list) # not bothering with multiple pages cause 30 members is way shorter than one embed
+		elif mode == 1: # add nickname
+			page = '\n'.join('{} ({})'.format(member.mention, member.display_name) for member in sorted_list)
+		else:
+			page = '\n'.join('{}'.format(member.mention) for member in sorted_list)
+
 		if truncated:
 			page += '\n*and {} more...*'.format(len(users) - self.MAX_USERS)
 
 		embed = discord.Embed(title='{} members with {}'.format(len(users), check_role.name), description=page, color=check_role.color)
 		embed.set_footer(text='ID: {}'.format(check_role.id))
 		await self.bot.say(embed=embed)
-
 
 	@commands.command(pass_context=True)
 	async def rolecount(self, ctx):
