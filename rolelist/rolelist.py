@@ -1,4 +1,5 @@
 
+import colorsys
 import discord
 from discord.ext import commands
 
@@ -112,11 +113,11 @@ class RoleList:
 	@commands.command(pass_context=True)
 	async def roles(self, ctx, category:str='all', sort_order:str='name'):
 		"""Shows roles and their member counts. 
-		The category is one of: all, species, rank, division, game 
-		and sortorder is one of: default, name, count.
+		The category is one of: all, species, rank, division, or game 
+		and sortorder is one of: default, name, count, or rainbow.
 		The species and all categories are only available to admin users."""
 
-		if not category in ['all', 'species', 'rank', 'division', 'game'] or not sort_order in ['default', 'name', 'count']: # make sure it has valid args
+		if not category in ['all', 'species', 'rank', 'division', 'game'] or not sort_order in ['default', 'name', 'count', 'rainbow']: # make sure it has valid args
 			await self.bot.say("Invalid arguments. Check the help for this command.")
 			return
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES) and category in ['all', 'species']: # restrict the spammy ones to admins
@@ -159,6 +160,8 @@ class RoleList:
 			sorted_list = sorted(rolecounts.items(), key=lambda tup: tup[0].name.lower())
 		elif sort_order == 'count': # count sort = decreasing member count
 			sorted_list = sorted(rolecounts.items(), key=lambda tup: tup[1], reverse=True)
+		elif sort_order == 'rainbow': # color sort: by increasing hue value in HSV color space
+			sorted_list = sorted(rolecounts.items(), key=lambda tup: colorsys.rgb_to_hsv(tup[0].color.r, tup[0].color.g, tup[0].color.b)[0])
 
 		if not sorted_list: # another failsafe
 			return
