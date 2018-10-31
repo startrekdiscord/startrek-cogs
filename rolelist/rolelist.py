@@ -4,12 +4,6 @@ from discord.ext import commands
 
 # constant for paginating embeds
 EMBED_MAX_LEN = 2048
-# these are for the font padding function, taken from whatever font discord uses on mac
-RELATIVE_WIDTH = {'1':11, '2':20, '3':19, '4':24, '5':20, '6':22, '7':20, '8':22, '9':22, '0':24}
-SPACE_WIDTH = 13 #width of space char
-PADDING_WIDTH = 10 #width of the padding char
-PADDING_CHAR = '-' #char to pad with
-PAD_SIZE = 4 #width of pad in spaces
 
 class RoleList:
 	"""Lists roles and their member count with different categories."""
@@ -118,11 +112,11 @@ class RoleList:
 	@commands.command(pass_context=True)
 	async def roles(self, ctx, category:str='all', sort_order:str='name'):
 		"""Shows roles and their member counts. 
-		The category is one of: all, species, rank, divion, game 
+		The category is one of: all, species, rank, division, game 
 		and sortorder is one of: default, name, count.
 		The species and all categories are only available to admin users."""
 
-		if not category in ['all', 'species', 'rank', 'divion', 'game'] or not sort_order in ['default', 'name', 'count']: # make sure it has valid args
+		if not category in ['all', 'species', 'rank', 'division', 'game'] or not sort_order in ['default', 'name', 'count']: # make sure it has valid args
 			await self.bot.say("Invalid arguments. Check the help for this command.")
 			return
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES) and category in ['all', 'species']: # restrict the spammy ones to admins
