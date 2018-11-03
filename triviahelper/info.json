@@ -1,0 +1,9 @@
+{
+	"AUTHOR" : "Jadzia",
+	"SHORT" : "Trivia management (work in progress)",
+	"DESCRIPTION" : "Provides commands to view, remove, and balance teams of trivia players based on roles.",
+	"DISABLED" : false,
+	"NAME" : "triviahelper",
+	"INSTALL_MSG" : "Trivia ready",
+	"TAGS" : ["utility", "moderation", "games"]
+}
