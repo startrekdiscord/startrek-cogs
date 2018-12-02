@@ -5,14 +5,14 @@ from dateutil.tz import tzlocal
 
 
 class Timecog:
-    """My custom cog that does stuff!"""
+    """Cog for handling time communication"""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(pass_context=True)
     async def time(self, ctx, *, time):
-        """This does stuff!"""
+        """Display time in reader's timezone"""
 
         timestamp = dateparser.parse(time)
         if timestamp is None:
