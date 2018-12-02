@@ -1,0 +1,9 @@
+{
+  "AUTHOR": "Tim",
+  "SHORT": "Displays time in reader's timezone",
+  "DESCRIPTION": "Displays a post with a timestamp that the user's discord client displays in their local timezone",
+  "DISABLED": false,
+  "NAME": "time",
+  "INSTALL_MSG": "Time for One = Time for All",
+  "TAGS": ["utility"]
+}
