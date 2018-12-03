@@ -47,7 +47,7 @@ class Timecog(commands.Cog):
                                ctx.message.author.display_name+" set to: "+location)
 
     @commands.command()
-    async def timefor(self, ctx, atless_mention):
+    async def timefor(self, ctx, *, atless_mention):
         """Outputs what a given user's clock reads"""
 
         targetUser = None
