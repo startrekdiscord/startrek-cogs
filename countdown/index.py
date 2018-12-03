@@ -1,6 +1,6 @@
 import discord
-from discord.ext import commands
-from cogs.utils.dataIO import dataIO
+from redbot.core import commands
+from redbot.core import Config
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -14,21 +14,13 @@ pip install python-dateutil
 """
 
 
-class Countdown:
+class Countdown(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.config = Config.get_conf(self, identifier=47477389) # random identifier
 
-        self.settings_file = "countdown.json"
-
-        # create the save file if it doesn't exist
-        if not dataIO.is_valid_json(self.settings_file):
-            dataIO.save_json(self.settings_file, {})
-        # load config
-        self.countdown_config = dataIO.load_json(self.settings_file)
-
-    def save_countdown_config(self):
-        # save when a new countdown is added or deleted
-        dataIO.save_json(self.settings_file, self.countdown_config)
+    async def save_countdown_config(self):
+        await self.config.countdowns.set(self.countdown_config)
 
     def calculate_until(self, end_time):
         # take a time string formatted as 'yyyy-mm-dd hh:mm:ss' and return how long it is from now
@@ -74,7 +66,7 @@ class Countdown:
         )
 
     @commands.command()
-    async def countdown(self, *, arg="next"):
+    async def countdown(self, ctx, *, arg="next"):
         """ Show next occuring countdown
 
         countdown list   - retrievs a list of stored countdowns
@@ -87,6 +79,10 @@ class Countdown:
 
         countdown [item] - get the definition for an item, ex: countdown christmas
         """
+
+        self.countdown_config = await self.config.countdowns()
+        if self.countdown_config is None:
+          self.countdown_config = {}
 
         if arg.startswith("add"):
 
@@ -110,14 +106,14 @@ class Countdown:
                     new_countdown_description,
                     new_countdown_synopsis,
                 ]
-                self.save_countdown_config()
-                await self.bot.say("Countdown added: " + new_countdown_shortname)
+                await self.save_countdown_config()
+                await ctx.send("Countdown added: " + new_countdown_shortname)
 
             except:
 
                 # syntax error
 
-                await self.bot.say(
+                await ctx.send(
                     "Syntax error! Please check your date format and argument order."
                 )
 
@@ -130,18 +126,18 @@ class Countdown:
                 countdown_to_remove = arg.split()[1]
                 # take out the entire named section and save
                 self.countdown_config.pop(countdown_to_remove)
-                self.save_countdown_config()
-                await self.bot.say("Removed countdown: " + countdown_to_remove)
+                await self.save_countdown_config()
+                await ctx.send("Removed countdown: " + countdown_to_remove)
 
             except:
 
-                await self.bot.say("Countdown not found: " + countdown_to_remove)
+                await ctx.send("Countdown not found: " + countdown_to_remove)
 
         elif arg.startswith("list"):
 
             # list existing countdowns
 
-            await self.bot.say(
+            await ctx.send(
                 "These are the existing countdowns:\n`"
                 + ", ".join(list(self.countdown_config.keys()))
                 + "`"
@@ -151,7 +147,7 @@ class Countdown:
 
             # display all countdowns, properly formatted (todo: put them in date order)
             for each_countdown in list(self.countdown_config.keys()):
-                await self.bot.say(self.show_countdown(each_countdown))
+                await ctx.send(self.show_countdown(each_countdown))
 
         elif arg.startswith("next"):
 
@@ -165,7 +161,7 @@ class Countdown:
                     datetime.datetime.strptime(v[0], "%Y-%m-%d %H:%M:%S")
                 )
             if len(temp_tags_list) < 1:
-                await self.bot.say("Error, no existing countdowns!")
+                await ctx.send("Error, no existing countdowns!")
             else:
                 # compare the temp dates to find the list index of the min
                 countdown_to_show = temp_tags_list[
@@ -173,7 +169,7 @@ class Countdown:
                         min(temp_dates_list)
                     )  # get the name of the corresponding index
                 ]
-                await self.bot.say(self.show_countdown(countdown_to_show))
+                await ctx.send(self.show_countdown(countdown_to_show))
 
         else:
 
@@ -182,11 +178,7 @@ class Countdown:
             try:
 
                 # pass the named countdown to the show_countdown function and send the result
-                await self.bot.say(self.show_countdown(arg.split()[0]))
+                await ctx.send(self.show_countdown(arg.split()[0]))
 
             except:
-                await self.bot.say("Countdown not found: " + arg.split()[0])
-
-
-def setup(bot):
-    bot.add_cog(Countdown(bot))
+                await ctx.send("Countdown not found: " + arg.split()[0])
