@@ -57,7 +57,7 @@ class Timecog:
         if targetUser is None:
             await self.bot.say("Unable to locate the specified user: " + atless_mention)
             return
-        targetUserId = ctx.message.author.id
+        targetUserId = targetUser.id
         self.db.execute(
             '''SELECT * FROM user_timezones WHERE user_id=?''', [targetUserId])
         result = self.db.fetchone()
