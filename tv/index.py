@@ -1,14 +1,11 @@
 import discord
 import sqlite3
-from discord.ext import commands
+from redbot.core import commands
 import requests
 
-class TV:
+class TV(commands.Cog):
     """Cog for interacting with the episodes database"""
 
-    def __init__(self, bot):
-        self.bot = bot
-        
     #tuple indexes    
     #series == 0
     #season == 1
@@ -55,7 +52,7 @@ class TV:
         return embed
     
     @commands.command()
-    async def trekommend(self, *arg):
+    async def trekommend(self, ctx, *arg):
         """Recommends a random episode of Star Trek! Include "TOS" or "DS9" for a recommendation from a specific series"""
         try:
             conn = sqlite3.connect('episodes.db')
@@ -67,8 +64,8 @@ class TV:
             
                 if(episode):
                     #Output
-                    await self.bot.say("I recommend:")
-                    await self.bot.say(embed=self.embed_episode(episode))  
+                    await ctx.send("I recommend:")
+                    await ctx.send(embed=self.embed_episode(episode))  
     
             else:
                 #Get a random episode from a given series
@@ -79,19 +76,19 @@ class TV:
                 if(len(rows) != 0):                
                     episode = rows[0]
                     #Output
-                    await self.bot.say("I recommend:")
-                    await self.bot.say(embed=self.embed_episode(episode))  
+                    await ctx.send("I recommend:")
+                    await ctx.send(embed=self.embed_episode(episode))  
 
                 
         except Exception as inst:
             print("Exception occured:")
             print(inst)     # the exception instance
             print(inst.args)     # arguments stored in .args
-            await self.bot.say("Whoops, an error occured!")
+            await ctx.send("Whoops, an error occured!")
                 
                 
     @commands.command()
-    async def episode(self, *arg):
+    async def episode(self, ctx, *arg):
         """Provide details about a given episode"""
         try:
             conn = sqlite3.connect('episodes.db')
@@ -106,7 +103,7 @@ class TV:
                 c.execute('SELECT * FROM episodes WHERE UPPER(name) LIKE UPPER(?) LIMIT 1', (episode_title,))
                 episode = c.fetchone()     
                 if(episode):
-                    await self.bot.say(embed=self.embed_episode(episode))  
+                    await ctx.send(embed=self.embed_episode(episode))  
                     return
                 
             if(len(arg) == 2):
@@ -119,19 +116,15 @@ class TV:
                 episode = c.fetchone()
 
                 if(episode):
-                    await self.bot.say(embed=self.embed_episode(episode))  
+                    await ctx.send(embed=self.embed_episode(episode))  
                     return
                         
             #episode not found in DB 
-            await self.bot.say("Please restate request. Accepted requests are in the following format:\n`In the pale moonlight` \n`DS9 s6e19`")
+            await ctx.send("Please restate request. Accepted requests are in the following format:\n`In the pale moonlight` \n`DS9 s6e19`")
                 
         except Exception as inst:
             print("Exception occured:")
             print(inst)     # the exception instance
             print(inst.args)     # arguments stored in .args
-            await self.bot.say("Please restate request. Accepted requests are in the following format:\n`In the pale moonlight` \n`DS9 s6e19`")
+            await ctx.send("Please restate request. Accepted requests are in the following format:\n`In the pale moonlight` \n`DS9 s6e19`")
             
-def setup(bot):
-    bot.add_cog(TV(bot))
-
-
