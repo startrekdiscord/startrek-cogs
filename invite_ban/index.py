@@ -3,7 +3,7 @@ from redbot.core import commands
 
 class InviteBan(commands.Cog):
     def __init__(self):
-        self.badlist = ["discord.gg", "twitch.tv", "twitter.com", "badlist_name"]
+        self.badlist = ["discord.gg", "twitch.tv", "twitter.com"]
 
     async def _check_name_for_invite(self, member):
         """
