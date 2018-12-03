@@ -49,9 +49,6 @@ class RoleList(commands.Cog):
 
 	MAX_USERS = 30 # max people to list for !whohas
 
-	def __init__(self, bot):
-		self.bot = bot
-
 	def role_check(self, user, role_query):
 		# returns True or False if a user has named role
 		for role in user.roles:

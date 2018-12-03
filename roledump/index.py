@@ -3,9 +3,6 @@ import discord
 from redbot.core import commands
 
 class Roledump(commands.Cog):
-	def __init__(self, bot):
-		self.bot = bot
-
 	@commands.command()
 	async def roledump(self, ctx):
 		#tfile = tempfile.TemporaryFile(mode='w+')

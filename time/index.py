@@ -12,8 +12,7 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyDnuQ_OgMeVMIZdUT252SAvjgC__Hsv-N8'
 class Timecog(commands.Cog):
     """Cog for handling time communication"""
 
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self):
         self.db_connection = sqlite3.connect('user_timezones.db')
         self.db = self.db_connection.cursor()
         self.db.execute(
