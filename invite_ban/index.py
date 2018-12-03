@@ -1,10 +1,9 @@
 import discord
+from redbot.core import commands
 
-
-class InviteBan:
-    def __init__(self, bot):
-        self.bot = bot
-        self.badlist = ["discord.gg", "twitch.tv", "twitter.com"]
+class InviteBan(commands.Cog):
+    def __init__(self):
+        self.badlist = ["discord.gg", "twitch.tv", "twitter.com", "badlist_name"]
 
     async def _check_name_for_invite(self, member):
         """
@@ -12,7 +11,7 @@ class InviteBan:
             server-specific name, and immediately ban them if it does
         """
         if any(n in member.display_name.lower() for n in self.badlist):
-            await self.bot.ban(member)
+            await member.guild.ban(member)
 
     async def on_member_join(self, member):
         """ check every user when they join """
@@ -27,8 +26,4 @@ class InviteBan:
         if message.mentions:
             user = message.mentions[0]
             if any(n in user.display_name.lower() for n in self.badlist):
-                await self.bot.delete_message(message)
-
-
-def setup(bot):
-    bot.add_cog(InviteBan(bot))
+                await message.delete()

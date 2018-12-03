@@ -15,8 +15,7 @@ pip install python-dateutil
 
 
 class Countdown(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self):
         self.config = Config.get_conf(self, identifier=47477389) # random identifier
 
     async def save_countdown_config(self):

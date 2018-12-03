@@ -1,8 +1,8 @@
 
 import discord
-from discord.ext import commands
+from redbot.core import commands
 
-class TriviaHelper:
+class TriviaHelper(commands.Cog):
 	ADMIN_ROLES = ['Redshirt', 'Senior Officer'] # needed to call the commands to manage trivia sessions
 
 	TEAMS = [406925463697621004, 406925533973315605, 406925579389108224] # team role IDs, in order
@@ -10,9 +10,6 @@ class TriviaHelper:
 	ALL_ROLES = TEAMS + [SPECTATE] # handy way to iterate over them all
 
 	THREE_CUTOFF = 9 # 9 or more people cause a third team to exist
-
-	def __init__(self, bot):
-		self.bot = bot
 
 	def flatten(self, lst):
 		# flattens nested lists
@@ -129,63 +126,63 @@ class TriviaHelper:
 			new = assignments_new.get(player)
 			if orig != new:
 				output += 'Switching {} from {} to {}.\n'.format(player.nick if player.nick else player.name,team_roles[orig].name,team_roles[new].name)
-				await self.bot.remove_roles(player, team_roles[orig])
+				await player.add_roles(team_roles[orig])
 				for idx,role in enumerate(player.roles):
 					if role == team_roles[orig]:
 						del player.roles[idx] # need this terrible hacky fix or else the role won't actually get removed
 						break
-				await self.bot.add_roles(player, team_roles[new])
+				await player.add_roles(team_roles[new])
 
 		if not output:
 			output = 'The teams are already balanced.'
-		await self.bot.say(output)
+		await ctx.send(output)
 
 
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def starttrivia(self, ctx, play_emote, spectate_emote):
 		"""Begins looking at the latest message in announcements for reactions and assigning people trivia roles."""
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES): # restrict to admins
-			await self.bot.say("That command is reserved for admins.")
+			await ctx.send("That command is reserved for admins.")
 			return
 
-		await self.bot.say('NYI')
+		await ctx.send('NYI')
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def freezetrivia(self, ctx):
 		"""Stops letting people join trivia via reactions."""
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES): # restrict to admins
-			await self.bot.say("That command is reserved for admins.")
+			await ctx.send("That command is reserved for admins.")
 			return
 
-		await self.bot.say('NYI')
+		await ctx.send('NYI')
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def balanceteams(self, ctx):
 		"""Balances the trivia teams."""
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES): # restrict to admins
-			await self.bot.say("That command is reserved for admins.")
+			await ctx.send("That command is reserved for admins.")
 			return
 
-		await self.balance_teams(ctx.message.server)
+		await self.balance_teams(ctx.message.guild)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def hastrivia(self, ctx):
 		"""Shows everyone who has trivia roles."""
-		trivia_roles = self.rolelist_filter(ctx.message.server.role_hierarchy, self.ALL_ROLES)
+		trivia_roles = self.rolelist_filter(ctx.message.guild.role_hierarchy, self.ALL_ROLES)
 
 		roles = {}
 		for check_role in trivia_roles:
 			roles[check_role] = []
 
 		total_roles = 0
-		for member in ctx.message.server.members:
+		for member in ctx.message.guild.members:
 			for check_role in trivia_roles:
 				if check_role in member.roles:
 					roles[check_role].append(member)
 					total_roles += 1
 
-		teams = self.get_teams(ctx.message.server) # list of lists of team members
+		teams = self.get_teams(ctx.message.guild) # list of lists of team members
 		players = set(self.flatten(teams))
 		imbalanced = False
 		if len(players) >= self.THREE_CUTOFF and len(teams) > 2 and not teams[2]:
@@ -206,21 +203,21 @@ class TriviaHelper:
 			embed.add_field(name=check_role.name, value=people)
 		if imbalanced:
 			embed.add_field(name='‼️ Teams are imbalanced ‼️', value='Use the `!balanceteams` command to balance them.')
-		await self.bot.say(embed=embed)
+		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def stoptrivia(self, ctx):
 		"""Removes any trivia roles from people that have them."""
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES): # restrict to admins
-			await self.bot.say("That command is reserved for admins.")
+			await ctx.send("That command is reserved for admins.")
 			return
-		trivia_roles = self.rolelist_filter(ctx.message.server.role_hierarchy, self.ALL_ROLES)
+		trivia_roles = self.rolelist_filter(ctx.message.guild.role_hierarchy, self.ALL_ROLES)
 
 		to_remove = {}
 		for check_role in trivia_roles:
 			to_remove[check_role] = []
 
-		for member in ctx.message.server.members:
+		for member in ctx.message.guild.members:
 			for check_role in trivia_roles:
 				if check_role in member.roles:
 					to_remove[check_role].append(member)
@@ -228,7 +225,7 @@ class TriviaHelper:
 		total_removes = 0
 		for check_role in trivia_roles:
 			for member in to_remove[check_role]:
-				await self.bot.remove_roles(member,check_role)
+				await member.remove_roles(check_role)
 				total_removes += 1
 
 		embed = discord.Embed(title='Removed the following trivia roles from:')
@@ -238,9 +235,4 @@ class TriviaHelper:
 			if not people:
 				people = '*nobody*'
 			embed.add_field(name=check_role.name, value=people)
-		await self.bot.say(embed=embed)
-
-
-
-def setup(bot):
-	bot.add_cog(TriviaHelper(bot))
+		await ctx.send(embed=embed)
