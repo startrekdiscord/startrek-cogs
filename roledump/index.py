@@ -1,23 +1,22 @@
 import json, tempfile
 import discord
-from discord.ext import commands
+from redbot.core import commands
 
-class Roledump:
+class Roledump(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def roledump(self, ctx):
 		#tfile = tempfile.TemporaryFile(mode='w+')
 		roles = []
-		for role in ctx.message.server.role_hierarchy:
+		role_hierarchy = ctx.message.guild.roles
+		role_hierarchy.reverse()
+		for role in role_hierarchy:
 			roles.append({'name':role.name, 'id':role.id})
 		tfile = open('roles_temp.json', 'w')
 		tfile.write(json.dumps(roles))
 		tfile.close()
 		tfile = open('roles_temp.json', 'rb')
-		await self.bot.send_file(ctx.message.channel, tfile, filename='roles.json', content='Here you go, {} roles exported:'.format(len(roles)))
+		await ctx.send(file=discord.File(tfile, filename="roles.json"), content='Here you go, {} roles exported:'.format(len(roles)))
 		tfile.close()
-
-def setup(bot):
-	bot.add_cog(Roledump(bot))
