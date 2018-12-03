@@ -74,7 +74,7 @@ class Timecog:
             dstOffset = response['dstOffset']
             rawOffset = response['rawOffset']
             totalOffset = dstOffset + rawOffset
-            theirTime = dateparser.parse('in '+str(totalOffset)+' minutes')
+            theirTime = dateparser.parse(' ' + str(totalOffset) + ' seconds ago UTC')
             await self.bot.say("The current time for "+targetUser.display_name+" is "+theirTime.strftime("%A @ %I:%M%p (%H:%M)"))
 
     @commands.command(pass_context=True)
