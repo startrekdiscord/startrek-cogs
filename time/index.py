@@ -66,7 +66,7 @@ class Timecog(commands.Cog):
         else:
             latitude = result[2]
             longitude = result[3]
-            currentEpochTimestamp = time.time()
+            currentEpochTimestamp = int(time.time())
             api_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(latitude) + \
                 ',' + str(longitude) + '&timestamp=' + \
                 str(currentEpochTimestamp) + '&key=' + GOOGLE_MAPS_API_KEY
@@ -74,7 +74,11 @@ class Timecog(commands.Cog):
             dstOffset = response['dstOffset']
             rawOffset = response['rawOffset']
             totalOffset = dstOffset + rawOffset
-            theirTime = dateparser.parse(' ' + str(totalOffset) + ' seconds ago UTC')
+            if totalOffset < 0:
+                theirTime = dateparser.parse(str(abs(totalOffset))+' seconds ago UTC')
+            else:
+                theirTime = dateparser.parse('in '+str(totalOffset)+' seconds UTC')
+            theirTime = theirTime.replace(tzinfo=tzlocal())
             await ctx.send("The current time for "+targetUser.display_name+" is "+theirTime.strftime("%A @ %I:%M%p (%H:%M)"))
 
     @commands.command()
