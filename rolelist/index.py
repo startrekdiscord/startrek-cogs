@@ -1,16 +1,17 @@
 
 import colorsys
 import discord
-from discord.ext import commands
+from redbot.core import commands
+
 
 # constant for paginating embeds
 EMBED_MAX_LEN = 2048
 
-class RoleList:
+class RoleList(commands.Cog):
 	"""Lists roles and their member count with different categories."""
 
 	## hardcoded role tables because i can't think of a better way to do it:
-	ADMIN_ROLES = ['Redshirt', 'Senior Officer'] # needed to call the more spammy commands
+	ADMIN_ROLES = ['Redshirt', 'Senior Officer', 'Engie'] # needed to call the more spammy commands
 	#these IDs have to be ints
 	RANK_ROLES = [  361843066254000130, # captain
 					361843316733640706, # first officer
@@ -82,17 +83,17 @@ class RoleList:
 		## iterate over the members to accumulate a count of each role
 		rolecounts = {}
 		for role in check_roles: # populate the accumulator dict
-			if not role.is_everyone:
+			if role.name != 'everyone':
 				rolecounts[role] = 0
 
 		for member in members:
 			for role in member.roles:
-				if role in check_roles and not role.is_everyone: # want to exclude @everyone from this list
+				if role in check_roles and role.name != 'everyone': # want to exclude @everyone from this list
 					rolecounts[role] += 1
 
 		return rolecounts
 
-	async def rolelist_paginate(self, rlist, title='Role List'):
+	async def rolelist_paginate(self, ctx, rlist, title='Role List'):
 		# takes a list of roles and counts and sends it out as multiple embed as nessecary
 		pages = []
 		buildstr = ''
@@ -108,9 +109,9 @@ class RoleList:
 
 		for index,page in enumerate(pages): # enumerate so we can add a page number
 			embed = discord.Embed(title='{} page {}/{}'.format(title, index+1, len(pages)), description=page)
-			await self.bot.say(embed=embed)
+			await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def roles(self, ctx, category:str='all', sort_order:str='name'):
 		"""Shows roles and their member counts. 
 		The category is one of: all, species, rank, division, or game 
@@ -118,38 +119,42 @@ class RoleList:
 		The species and all categories are only available to admin users."""
 
 		if not category in ['all', 'species', 'rank', 'division', 'game'] or not sort_order in ['default', 'name', 'count', 'rainbow']: # make sure it has valid args
-			await self.bot.say("Invalid arguments. Check the help for this command.")
+			await ctx.send("Invalid arguments. Check the help for this command.")
 			return
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES) and category in ['all', 'species']: # restrict the spammy ones to admins
-			await self.bot.say("That category is reserved for admins.")
+			await ctx.send("That category is reserved for admins.")
 			return
 
-		check_roles = [] # the list of roles to search for
+		check_roles = []  # the list of roles to search for
+		# the following two lines are a result of migration to discord.py v1.0
+		# guild.roles is the same as server.role_hierarchy from previous versions, but in reverse
+		roles = ctx.message.guild.roles.copy()
+		roles.reverse()
 		if category == 'all':
-			check_roles = ctx.message.server.role_hierarchy # we use role_hierarchy for these because sometimes we want to see the order
+			check_roles = roles
 		elif category == 'rank':
-			check_roles = self.rolelist_filter(ctx.message.server.role_hierarchy, self.RANK_ROLES) # filter from hardcoded list
+			check_roles = self.rolelist_filter(roles, self.RANK_ROLES) # filter from hardcoded list
 		elif category == 'division':
-			check_roles = self.rolelist_filter(ctx.message.server.role_hierarchy, self.DIVISION_ROLES)
+			check_roles = self.rolelist_filter(roles, self.DIVISION_ROLES)
 		elif category == 'game':
-			check_roles = self.rolelist_filter(ctx.message.server.role_hierarchy, self.GAME_ROLES)
+			check_roles = self.rolelist_filter(roles, self.GAME_ROLES)
 		elif category == 'species': #this is the tricky one
 			start = None
 			end = None
-			for index,role in enumerate(ctx.message.server.role_hierarchy): # search the index of the start and end of species roles
+			for index,role in enumerate(roles): # search the index of the start and end of species roles
 				rid = int(role.id)
 				if rid == self.SPECIES_BEFORE:
 					start = index
 				if rid == self.SPECIES_AFTER:
 					end = index
 			if start != None and end != None: # if we found both
-				check_roles = ctx.message.server.role_hierarchy[start+1:end] # cut list from searched values
+				check_roles = roles[start+1:end] # cut list from searched values
 
 		if not check_roles: # failsafe if its not populated
 			return
 
 		## now we iterate over the members to accumulate a count of each role
-		rolecounts = self.role_accumulate(check_roles, ctx.message.server.members)
+		rolecounts = self.role_accumulate(check_roles, ctx.message.guild.members)
 
 		sorted_list = []
 		if sort_order == 'default': # default sort = the server role hierarchy
@@ -166,19 +171,19 @@ class RoleList:
 		if not sorted_list: # another failsafe
 			return
 
-		await self.rolelist_paginate(sorted_list) # send the list to get actually printed to discord
+		await self.rolelist_paginate(ctx, sorted_list) # send the list to get actually printed to discord
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rolecall(self, ctx, *, rolename):
 		"""Counts the number of members with a specific role."""
-		check_role = self.get_named_role(ctx.message.server, rolename)
+		check_role = self.get_named_role(ctx.message.guild, rolename)
 		if not check_role:
-			await self.bot.say("I can't find that role!")
+			await ctx.send("I can't find that role!")
 			return
 
 		count = 0
 		online = 0
-		for member in ctx.message.server.members:
+		for member in ctx.message.guild.members:
 			if check_role in member.roles:
 				count += 1
 				if member.status != discord.Status.offline:
@@ -186,9 +191,9 @@ class RoleList:
 
 		embed = discord.Embed(title=check_role.name, description='{}/{} online'.format(online, count), color=check_role.color)
 		embed.set_footer(text='ID: {}'.format(check_role.id))
-		await self.bot.say(embed=embed)
+		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def whohas(self, ctx, *, rolename):
 		"""Lists the people who have the specified role.
 		Can take a -nick or -username argument to enhance output."""
@@ -200,13 +205,13 @@ class RoleList:
 			mode = 2
 			rolename = rolename.replace('-username','')
 
-		check_role = self.get_named_role(ctx.message.server, rolename)
+		check_role = self.get_named_role(ctx.message.guild, rolename)
 		if not check_role:
-			await self.bot.say("I can't find that role!")
+			await ctx.send("I can't find that role!")
 			return
 
 		users = []
-		for member in ctx.message.server.members:
+		for member in ctx.message.guild.members:
 			if check_role in member.roles:
 				users.append(member)
 
@@ -227,22 +232,23 @@ class RoleList:
 
 		embed = discord.Embed(title='{} members with {}'.format(len(users), check_role.name), description=page, color=check_role.color)
 		embed.set_footer(text='ID: {}'.format(check_role.id))
-		await self.bot.say(embed=embed)
+		await ctx.send(embed=embed)
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def rolecount(self, ctx):
 		"""Simply counts the number of roles on the server. (excluding @everyone)"""
-		await self.bot.say('This server has {} total roles.'.format(len(ctx.message.server.roles) - 1))
+		await ctx.send('This server has {} total roles.'.format(len(ctx.message.guild.roles) - 1))
 
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def emptyroles(self, ctx):
 		"""Shows a list of roles that have zero members."""
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES): # restrict to admins
-			await self.bot.say("That command is reserved for admins.")
+			await ctx.send("That command is reserved for admins.")
 			return
 
-		check_roles = ctx.message.server.role_hierarchy # grab in hierarchy order so they're easier to find in the server settings
-		rolecounts = self.role_accumulate(check_roles, ctx.message.server.members) # same accumulate as the `roles` command
+		check_roles = ctx.message.guild.roles
+		check_roles.reverse() # reverse the list of roles to be backwards compatible with v2 code
+		rolecounts = self.role_accumulate(check_roles, ctx.message.guild.members) # same accumulate as the `roles` command
 
 		sorted_list = []
 		for role in check_roles:
@@ -250,10 +256,7 @@ class RoleList:
 				sorted_list.append((role, rolecounts.get(role,0)))
 
 		if not sorted_list: # another failsafe
-			await self.bot.say('Seems there are no empty roles...')
+			await ctx.send('Seems there are no empty roles...')
 
-		await self.rolelist_paginate(sorted_list, title='Empty Roles')
+		await self.rolelist_paginate(ctx, sorted_list, title='Empty Roles')
 
-
-def setup(bot):
-	bot.add_cog(RoleList(bot))
