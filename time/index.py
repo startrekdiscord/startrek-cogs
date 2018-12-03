@@ -75,7 +75,7 @@ class Timecog(commands.Cog):
             rawOffset = response['rawOffset']
             totalOffset = dstOffset + rawOffset
             theirTime = dateparser.parse(' ' + str(totalOffset) + ' seconds ago UTC')
-            await ctx.send("The current time for "+targetUser.display_name+" is "+theirTime.strftime("%c"))#.strftime("%A @ %I:%M%p (%H:%M)"))
+            await ctx.send("The current time for "+targetUser.display_name+" is "+theirTime.strftime("%A @ %I:%M%p (%H:%M)"))
 
     @commands.command()
     async def time(self, ctx, *, time):
