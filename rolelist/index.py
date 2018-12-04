@@ -2,6 +2,8 @@
 import colorsys
 import discord
 from redbot.core import commands
+from PIL import Image, ImageDraw, ImageFont
+import math
 
 
 # constant for paginating embeds
@@ -107,6 +109,41 @@ class RoleList(commands.Cog):
 		for index,page in enumerate(pages): # enumerate so we can add a page number
 			embed = discord.Embed(title='{} page {}/{}'.format(title, index+1, len(pages)), description=page)
 			await ctx.send(embed=embed)
+
+	@commands.command()
+	async def species(self, ctx):
+		await ctx.message.delete()
+		roles = ctx.message.guild.roles
+
+		MARGIN = 20
+		PADDING = 10
+
+		width = 860
+		innerWidth = width - (MARGIN + PADDING)*2
+		horizontalSpacing = math.floor(innerWidth/4)
+
+		verticalSpacing = 40
+		innerHeight = math.floor((0.5+math.floor(len(roles)/4))*verticalSpacing)
+		height = (MARGIN + PADDING) * 2 + innerHeight
+
+
+		img = Image.new('RGB', (width, height), color='#202225')
+
+		font = ImageFont.truetype('helvetica.ttf', size=16)
+
+		d = ImageDraw.Draw(img)
+		d.rectangle([(MARGIN, MARGIN), (width - MARGIN, height - MARGIN)], fill='#36393f')
+		index = 0
+		for role in roles:
+			textY = MARGIN + PADDING + math.floor(index / 4) * verticalSpacing
+			textX = MARGIN + PADDING + (index % 4) * horizontalSpacing
+			d.text((textX, textY), role.name, fill=str(role.colour), font=font)
+			index = index + 1
+		img.save('roles.png')
+		tfile = open('roles.png', 'rb')
+		await ctx.send(file=discord.File(tfile, filename="roles.png"), content='Species List')
+		tfile.close()
+
 
 	@commands.command()
 	async def roles(self, ctx, category:str='all', sort_order:str='name'):
