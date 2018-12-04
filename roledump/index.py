@@ -1,11 +1,10 @@
-import json, tempfile
+import json
 import discord
 from redbot.core import commands
 
 class Roledump(commands.Cog):
 	@commands.command()
 	async def roledump(self, ctx):
-		#tfile = tempfile.TemporaryFile(mode='w+')
 		roles = []
 		role_hierarchy = ctx.message.guild.roles
 		role_hierarchy.reverse()
