@@ -10,7 +10,10 @@ class RoleList:
 	"""Lists roles and their member count with different categories."""
 
 	## hardcoded role tables because i can't think of a better way to do it:
-	ADMIN_ROLES = ['Redshirt', 'Senior Officer'] # needed to call the more spammy commands
+	ADMIN_ROLES = [
+		279466664884699136, # Redshirt
+		275120133305794561, # Senior Officer
+		496516286730469387] # Engie
 	#these IDs have to be ints
 	RANK_ROLES = [  361843066254000130, # captain
 					361843316733640706, # first officer
@@ -54,7 +57,7 @@ class RoleList:
 	def role_check(self, user, role_query):
 		# returns True or False if a user has named role
 		for role in user.roles:
-			if role.name in role_query:
+			if role.id in role_query:
 				return True
 		return False
 

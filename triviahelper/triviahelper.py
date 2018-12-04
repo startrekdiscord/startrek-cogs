@@ -3,7 +3,10 @@ import discord
 from discord.ext import commands
 
 class TriviaHelper:
-	ADMIN_ROLES = ['Redshirt', 'Senior Officer'] # needed to call the commands to manage trivia sessions
+	ADMIN_ROLES = [
+		279466664884699136, # Redshirt
+		275120133305794561, # Senior Officer
+		496516286730469387] # Engie
 
 	TEAMS = [406925463697621004, 406925533973315605, 406925579389108224] # team role IDs, in order
 	SPECTATE = 406925622020145154 # role ID for spectator
@@ -25,7 +28,7 @@ class TriviaHelper:
 	def role_check(self, user, role_query):
 		# returns True or False if a user has named role
 		for role in user.roles:
-			if role.name in role_query:
+			if role.id in role_query:
 				return True
 		return False
 
