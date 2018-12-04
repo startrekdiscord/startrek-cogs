@@ -11,7 +11,7 @@ class RoleList(commands.Cog):
 	"""Lists roles and their member count with different categories."""
 
 	## hardcoded role tables because i can't think of a better way to do it:
-	ADMIN_ROLES = ['Redshirt', 'Senior Officer', 'Engie'] # needed to call the more spammy commands
+	ADMIN_ROLES = ['Redshirt', 'Senior Officer', 'Engie', 'Elfshirt'] # needed to call the more spammy commands
 	#these IDs have to be ints
 	RANK_ROLES = [  361843066254000130, # captain
 					361843316733640706, # first officer

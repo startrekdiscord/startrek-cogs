@@ -3,7 +3,7 @@ import discord
 from redbot.core import commands
 
 class TriviaHelper(commands.Cog):
-	ADMIN_ROLES = ['Redshirt', 'Senior Officer'] # needed to call the commands to manage trivia sessions
+	ADMIN_ROLES = ['Redshirt', 'Senior Officer', 'Engie', 'Elfshirt'] # needed to call the commands to manage trivia sessions
 
 	TEAMS = [406925463697621004, 406925533973315605, 406925579389108224] # team role IDs, in order
 	SPECTATE = 406925622020145154 # role ID for spectator
