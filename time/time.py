@@ -62,7 +62,7 @@ class Timecog:
             '''SELECT * FROM user_timezones WHERE user_id=?''', [targetUserId])
         result = self.db.fetchone()
         if result is None:
-            await self.bot.say("I do not have timezone information for that user.")
+            await self.bot.say("I do not have timezone information for that user. If this user exists, they should use the ilivein command to set their location.")
         else:
             latitude = result[2]
             longitude = result[3]
