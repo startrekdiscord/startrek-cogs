@@ -172,7 +172,7 @@ class TriviaHelper(commands.Cog):
 	@commands.command()
 	async def hastrivia(self, ctx):
 		"""Shows everyone who has trivia roles."""
-		trivia_roles = self.rolelist_filter(ctx.message.guild.role_hierarchy, self.ALL_ROLES)
+		trivia_roles = self.rolelist_filter(ctx.message.guild.roles, self.ALL_ROLES)
 
 		roles = {}
 		for check_role in trivia_roles:
@@ -214,7 +214,7 @@ class TriviaHelper(commands.Cog):
 		if not self.role_check(ctx.message.author, self.ADMIN_ROLES): # restrict to admins
 			await ctx.send("That command is reserved for admins.")
 			return
-		trivia_roles = self.rolelist_filter(ctx.message.guild.role_hierarchy, self.ALL_ROLES)
+		trivia_roles = self.rolelist_filter(ctx.message.guild.roles, self.ALL_ROLES)
 
 		to_remove = {}
 		for check_role in trivia_roles:
