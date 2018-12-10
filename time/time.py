@@ -7,6 +7,9 @@ import requests
 import time
 import json
 
+from .utils import checks
+from fractions import Fraction
+
 with open('google_api_key.json') as f:
     GOOGLE_MAPS_API_KEY = json.load(f)
 
@@ -24,6 +27,26 @@ class Timecog:
 
     def __del__(self):
         self.db_connection.close()
+
+    @commands.command(name="force_global_exchange", pass_context=True)
+    @checks.admin_or_permissions(manage_server=True)
+    async def _force_global_exchange(self, ctx):
+        """forces all users to put their casino chips in their bank"""
+
+        casino = self.bot.get_cog('Casino')
+        bank = self.bot.get_cog('Economy').bank
+        settings = casino.check_server_settings(ctx.message.server)
+        credit_rate = settings["System Config"]["Credit Rate"]
+
+        for user in ctx.message.server.members:
+            if bank.account_exists(user) and casino.membership_exists(user):
+                account = casino.get_membership(user)
+                amount = account["Chips"]
+                casino.withdraw_chips(user, amount)
+                credits = int(amount * credit_rate)
+                bank.deposit_credits(user, credits)
+
+        await self.bot.say("All chips have been put back in their respective user's account.")
 
     @commands.command(pass_context=True)
     async def ilivein(self, ctx, *, location):
