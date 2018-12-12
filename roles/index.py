@@ -93,11 +93,11 @@ class Roles(commands.Cog):
 
         departmentIds = await self.config.guild(ctx.guild).departments()
 
-        departments = []
+        departmentsToBeRemoved = []
         targetRole = None
         for role in ctx.guild.roles:
             if role.id in departmentIds and role in ctx.message.author.roles:
-                departments.append(role)
+                departmentsToBeRemoved.append(role)
             if role.name == role_name:
                 targetRole = role
 
@@ -109,7 +109,7 @@ class Roles(commands.Cog):
             await ctx.send(content="{} not a department".format(targetRole))
             return
 
-        await ctx.message.author.remove_roles(*departments)
+        await ctx.message.author.remove_roles(*departmentsToBeRemoved)
         await ctx.message.author.add_roles(targetRole)
         await ctx.send(content="{}'s department is now {}".format(ctx.message.author.name, targetRole))
         
