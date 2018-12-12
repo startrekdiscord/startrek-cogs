@@ -1,0 +1,9 @@
+{
+  "AUTHOR": "Tim",
+  "SHORT": "Manages roles",
+  "DESCRIPTION": "Manages roles",
+  "DISABLED": false,
+  "NAME": "roles",
+  "INSTALL_MSG": "One Role to Role Them All",
+  "TAGS": ["utility"]
+}
