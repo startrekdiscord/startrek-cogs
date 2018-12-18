@@ -39,7 +39,9 @@ class Timecog:
         credit_rate = settings["System Config"]["Credit Rate"]
 
         for user in ctx.message.server.members:
-            if bank.account_exists(user) and casino.membership_exists(user):
+            if casino.membership_exists(user):
+                if not bank.account_exists(user):
+                    bank.create_account(user, initial_balance=0)
                 account = casino.get_membership(user)
                 amount = account["Chips"]
                 casino.withdraw_chips(user, amount)
