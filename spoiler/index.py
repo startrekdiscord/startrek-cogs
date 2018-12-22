@@ -44,10 +44,11 @@ class Spoiler(commands.Cog):
 
         embed = discord.Embed(description=despoilered, color=0xff0000)
         embed.set_author(name=name, url="https://google.com?q={}".format(message.author.id))
-        embed.set_footer(text="↙[click for DM]")
+        embed.set_footer(text="[react with 👀 for DM]")
 
         spoilerMessage = await message.channel.send(embed=embed)
 
+        dmedUserIds = []
 
         await spoilerMessage.add_reaction(KEY_REACTION_EMOJI)
 
@@ -60,8 +61,10 @@ class Spoiler(commands.Cog):
             except asyncio.TimeoutError:
                 None
             else:
-                dmEmbed = discord.Embed(description=demarkuped, color=0xff0000)
-                dmEmbed.set_author(name=name, url="https://google.com?q={}".format(message.author.id))
-                await user.send(embed=dmEmbed)
+                if user.id not in dmedUserIds:
+                    dmEmbed = discord.Embed(description=demarkuped, color=0xff0000)
+                    dmEmbed.set_author(name=name, url="https://google.com?q={}".format(message.author.id))
+                    await user.send(embed=dmEmbed)
+                    dmedUserIds.append(user.id)
                 await listenForReaction()
         await listenForReaction()
