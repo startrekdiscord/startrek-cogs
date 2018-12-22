@@ -44,7 +44,7 @@ class Spoiler(commands.Cog):
 
         embed = discord.Embed(description=despoilered, color=0xff0000)
         embed.set_author(name=name, url="https://google.com?q={}".format(message.author.id))
-        embed.set_footer(text="↙[click for DM]")
+        embed.set_footer(text="[react with 👀 for DM]")
 
         spoilerMessage = await message.channel.send(embed=embed)
 
