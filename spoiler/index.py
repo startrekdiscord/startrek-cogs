@@ -57,7 +57,8 @@ class Spoiler(commands.Cog):
 
         async def listenForReaction():
             try:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=60 * 60.0, check=check)
+                oneWeek = 7 * 24 * 60 * 60.0
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=oneWeek, check=check)
             except asyncio.TimeoutError:
                 None
             else:
