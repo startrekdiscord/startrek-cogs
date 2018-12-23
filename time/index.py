@@ -5,9 +5,10 @@ from dateutil.tz import tzlocal
 import sqlite3
 import requests
 import time
+import json
 
-GOOGLE_MAPS_API_KEY = 'AIzaSyDnuQ_OgMeVMIZdUT252SAvjgC__Hsv-N8'
-
+with open('google_api_key.json') as f:
+    GOOGLE_MAPS_API_KEY = json.load(f)
 
 class Timecog(commands.Cog):
     """Cog for handling time communication"""
