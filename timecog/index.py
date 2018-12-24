@@ -57,7 +57,7 @@ class Timecog(commands.Cog):
             return
         targetUser = None
         for member in ctx.message.guild.members:
-            if atless_mention == member.name + '#' + member.discriminator or int(atless_mention) == member.id:
+            if atless_mention == member.name + '#' + member.discriminator or atless_mention == member.id:
                 targetUser = member
         if targetUser is None:
             await ctx.send("Unable to locate the specified user: " + atless_mention)
