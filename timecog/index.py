@@ -50,9 +50,14 @@ class Timecog(commands.Cog):
     async def timefor(self, ctx, *, atless_mention):
         """Outputs what a given user's clock reads"""
 
+        if len(ctx.message.mentions) > 0:
+            mentionedUser = ctx.message.mentions[0]
+            correctedAtlessMention = mentionedUser.name+'#'+mentionedUser.discriminator            
+            await ctx.send("Please do not ping the user while determining their local time. To use this command, remove the `@` from the mention.\nInstead, try this command: `timefor "+correctedAtlessMention+'`')
+            return
         targetUser = None
         for member in ctx.message.guild.members:
-            if atless_mention == member.name + '#' + member.discriminator:
+            if atless_mention == member.name + '#' + member.discriminator or int(atless_mention) == member.id:
                 targetUser = member
         if targetUser is None:
             await ctx.send("Unable to locate the specified user: " + atless_mention)
