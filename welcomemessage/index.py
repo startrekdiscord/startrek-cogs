@@ -12,7 +12,11 @@ class WelcomeMessage(commands.Cog):
 
     async def on_member_join(self, member):
         """Send message when user joins"""
-        await member.send(content="Welcome to the Star Trek Discord!")
+
+        status = await self.config.guild(member.guild).status()
+        if status == "on":
+            message = await self.config.guild(member.guild).message()
+            await member.send(content=message)
 
     @commands.group()
     @commands.guild_only()
