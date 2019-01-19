@@ -96,7 +96,7 @@ class Roles(commands.Cog):
 
         targetRole = None
         for role in ctx.guild.roles:
-            if role.name == role_name and role.id in gameIds:
+            if not role.permissions.manage_guild and role.name == role_name and role.id in gameIds:
                 targetRole = role
 
         if targetRole is None:
