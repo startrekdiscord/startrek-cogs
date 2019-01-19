@@ -186,8 +186,9 @@ class Roles(commands.Cog):
 
         targetRole = None
         for role in ctx.guild.roles:
-            if role.name == role_name or role.id == role_name:
-                targetRole = role
+            if role.id in departmentIds:
+                if role.name == role_name or role.id == role_name:
+                    targetRole = role
 
         if targetRole is None:
             await ctx.send(content="Role not found: {}".format(role_name))
@@ -204,7 +205,7 @@ class Roles(commands.Cog):
     @checks.mod_or_permissions(manage_guild=True)
     @department.command(name="reset")
     @commands.guild_only()
-    async def _remove_department(self, ctx: commands.Context, *, role_name: str):
+    async def _reset_departments(self, ctx: commands.Context, *, role_name: str):
         """Empties department list."""
 
         await self.config.guild(ctx.guild).departments.set([])
