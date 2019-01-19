@@ -161,7 +161,7 @@ class Roles(commands.Cog):
 
         targetRole = None
         for role in ctx.guild.roles:
-            if role.name == role_name:
+            if role.name == role_name or role.id == role_name:
                 targetRole = role
 
         if targetRole is None:
@@ -186,7 +186,7 @@ class Roles(commands.Cog):
 
         targetRole = None
         for role in ctx.guild.roles:
-            if role.name == role_name:
+            if role.name == role_name or role.id == role_name:
                 targetRole = role
 
         if targetRole is None:
@@ -201,6 +201,14 @@ class Roles(commands.Cog):
         await self.config.guild(ctx.guild).departments.set(departmentIds)
         await ctx.send(content="Department removed: {}".format(targetRole))
 
+    @checks.mod_or_permissions(manage_guild=True)
+    @department.command(name="reset")
+    @commands.guild_only()
+    async def _remove_department(self, ctx: commands.Context, *, role_name: str):
+        """Empties department list."""
+
+        await self.config.guild(ctx.guild).departments.set([])
+
     @department.command(name="select")
     @commands.guild_only()
     async def _select_department(self, ctx: commands.Context, *, role_name: str):
@@ -211,10 +219,11 @@ class Roles(commands.Cog):
         departmentsToBeRemoved = []
         targetRole = None
         for role in ctx.guild.roles:
-            if role.id in departmentIds and role in ctx.message.author.roles:
-                departmentsToBeRemoved.append(role)
-            if role.name == role_name:
-                targetRole = role
+            if role.id in departmentIds:
+                if role in ctx.message.author.roles:
+                    departmentsToBeRemoved.append(role)
+                if role.name == role_name or role.id == role_name:
+                    targetRole = role
 
         if targetRole is None:
             await ctx.send(content="Role not found: {}".format(role_name))
