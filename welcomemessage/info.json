@@ -1,0 +1,9 @@
+{
+  "AUTHOR": "Tim",
+  "SHORT": "Send users message when they join",
+  "DESCRIPTION": "Send users message when they join",
+  "DISABLED": false,
+  "NAME": "welcomemessage",
+  "INSTALL_MSG": "Message on join",
+  "TAGS": ["utility"]
+}
